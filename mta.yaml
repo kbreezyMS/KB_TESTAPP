@@ -7,24 +7,43 @@ modules:
     path: web
     requires:
       - name: UAA-Service
-
+      - name: core_xsjs_api
+        properties:
+          name: core-xsjs-backend
+          url: '~{url}'
+          forwardAuthToken: true
+        group: destinations
+      - name: UI5
   - name: kbdb
     type: hdb
     path: kbdb
     requires:
-     - name: hdi_kbdb
-
+      - name: hdi_kbdb
+  - name: core_xsjs
+    type: nodejs
+    path: core_xsjs
+    provides:
+      - name: core_xsjs_api
+        properties:
+          url: '${default-url}'
+    requires:
+      - name: UAA-Service
+      - name: hdi_kbdb
+      - name: kbdb
 resources:
   - name: UAA-Service
     type: com.sap.xs.uaa-space
     parameters:
       config-path: /xs-security.json
-
   - name: hdi_kbdb
     parameters:
-       config:
-          schema: KBDB
+      config:
+        schema: KBDB
     properties:
-       hdi-container-name: ${service-name}
+      hdi-container-name: '${service-name}'
     type: com.sap.xs.hdi-container
-
+  - name: UI5
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: sapui5_sb
+      service-plan: sapui5-1.52
